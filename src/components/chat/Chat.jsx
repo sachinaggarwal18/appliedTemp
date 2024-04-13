@@ -108,6 +108,7 @@ const Chat = () => {
     });
 
     setText("");
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -174,6 +175,12 @@ const Chat = () => {
           }
           value={text}
           onChange={(e) => setText(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              handleSend();
+            }
+          }}
           disabled={isCurrentUserBlocked || isReceiverBlocked}
         />
         <div className="emoji">

@@ -68,6 +68,21 @@ const ChatList = () => {
     c.user.username.toLowerCase().includes(input.toLowerCase())
   );
 
+  const handleDeleteUser = async (chat, event) => {
+    event.stopPropagation();
+
+    const userChatsRef = doc(db, "userchats", currentUser.id);
+    const userChats = chats.filter(item => item.chatId !== chat.chatId);
+  
+    try {
+      await updateDoc(userChatsRef, {
+        chats: userChats,
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <div className="chatList">
       <div className="search">
@@ -111,6 +126,7 @@ const ChatList = () => {
             </span>
             <p>{chat.lastMessage}</p>
           </div>
+          <button onClick={(event) => handleDeleteUser(chat, event)}>Delete User</button>
         </div>
       ))}
 

@@ -14,6 +14,7 @@ import {
 } from "firebase/firestore";
 import { useState } from "react";
 import { useUserStore } from "../../../../lib/userStore";
+import { toast } from "react-toastify";
 
 const AddUser = () => {
   const [user, setUser] = useState(null);
@@ -45,6 +46,15 @@ const AddUser = () => {
     const userChatsRef = collection(db, "userchats");
 
     try {
+
+      const userChatsDoc = await getDoc(doc(userChatsRef, currentUser.id));
+      const userChats = userChatsDoc.data().chats;
+
+      if (userChats.some(chat => chat.receiverId === user.id)) {
+        toast.warn("User is already in the chat list!");
+        return;
+      }
+
       const newChatRef = doc(chatRef);
 
       await setDoc(newChatRef, {
@@ -70,7 +80,7 @@ const AddUser = () => {
         }),
       });
     } catch (err) {
-      console.log(err);
+      console.log("Error adding user: ", err);
     }
   };
 

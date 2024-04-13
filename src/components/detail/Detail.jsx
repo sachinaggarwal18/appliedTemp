@@ -1,8 +1,9 @@
-import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore";
+import { arrayRemove, arrayUnion, doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { useChatStore } from "../../lib/chatStore";
 import { auth, db } from "../../lib/firebase";
 import { useUserStore } from "../../lib/userStore";
 import "./detail.css";
+import { useState } from "react";
 
 const Detail = () => {
   const { chatId, user, isCurrentUserBlocked, isReceiverBlocked, changeBlock, resetChat } =
@@ -24,9 +25,40 @@ const Detail = () => {
     }
   };
 
+  const handleDeleteChat = async () => {
+    if (!chatId) return;
+  
+    const chatDocRef = doc(db, "chats", chatId);
+  
+    try {
+      await deleteDoc(chatDocRef);
+      resetChat();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const handleLogout = () => {
     auth.signOut();
     resetChat()
+  };
+  
+  const [isChatSettingsVisible, setChatSettingsVisible] = useState(false);
+
+  const handleChatSettingsToggle = () => {
+    setChatSettingsVisible(!isChatSettingsVisible);
+  };
+
+  const [isSharedPhotosVisible, setSharedPhotosVisible] = useState(false);
+
+  const handleSharedPhotosToggle = () => {
+    setSharedPhotosVisible(!isSharedPhotosVisible);
+  };
+
+  const [isSharedFilesVisible, setSharedFilesVisible] = useState(false);
+
+  const handleSharedFilesToggle = () => {
+    setSharedFilesVisible(!isSharedFilesVisible);
   };
 
   return (
@@ -34,33 +66,26 @@ const Detail = () => {
       <div className="user">
         <img src={user?.avatar || "./avatar.png"} alt="" />
         <h2>{user?.username}</h2>
-        <p>Lorem ipsum dolor sit amet.</p>
       </div>
       <div className="info">
         <div className="option">
           <div className="title">
             <span>Chat Settings</span>
-            <img src="./arrowUp.png" alt="" />
-          </div>
-        </div>
-        <div className="option">
-          <div className="title">
-            <span>Chat Settings</span>
-            <img src="./arrowUp.png" alt="" />
-          </div>
-        </div>
-        <div className="option">
-          <div className="title">
-            <span>Privacy & help</span>
-            <img src="./arrowUp.png" alt="" />
-          </div>
+            <img src={isChatSettingsVisible ? "./arrowUp.png" : "./arrowDown.png"} alt="" onClick={handleChatSettingsToggle} />
+            </div>
+            {isChatSettingsVisible && (
+              <button onClick={handleBlock}>
+                {isCurrentUserBlocked ? "You are Blocked!" : isReceiverBlocked ? "User blocked" : "Block User"}
+              </button>
+            )}
         </div>
         <div className="option">
           <div className="title">
             <span>Shared photos</span>
-            <img src="./arrowDown.png" alt="" />
+            <img src={isSharedPhotosVisible ? "./arrowUp.png" : "./arrowDown.png"} alt="" onClick={handleSharedPhotosToggle} />
           </div>
-          <div className="photos">
+          {isSharedPhotosVisible && (
+            <div className="photos">
             <div className="photoItem">
               <div className="photoDetail">
                 <img
@@ -102,19 +127,16 @@ const Detail = () => {
               <img src="./download.png" alt="" className="icon" />
             </div>
           </div>
+            )}
         </div>
         <div className="option">
           <div className="title">
             <span>Shared Files</span>
-            <img src="./arrowUp.png" alt="" />
+            <img src={isSharedFilesVisible ? "./arrowUp.png" : "./arrowDown.png"} alt="" onClick={handleSharedFilesToggle} />
           </div>
         </div>
-        <button onClick={handleBlock}>
-          {isCurrentUserBlocked
-            ? "You are Blocked!"
-            : isReceiverBlocked
-            ? "User blocked"
-            : "Block User"}
+        <button className="deleteChat" onClick={handleDeleteChat}>
+          Delete Chat
         </button>
         <button className="logout" onClick={handleLogout}>
           Logout

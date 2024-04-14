@@ -34,11 +34,5 @@ pipeline {
                 sh 'npm install'
             }
         }
-
-        stage('TRIVY FS SCAN') {
-            steps {
-                sh 'trivy fs . > trivyfs.txt'
-            }
-        }
     }
 }

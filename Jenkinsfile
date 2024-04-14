@@ -17,10 +17,11 @@ pipeline {
 
     stages {
         stage('Clean workspace') {
-            steps {
-                cleanWs()
-            }
-        }
+    steps {
+        deleteDir()
+    }
+}
+
 
         stage('Checkout from Git') {
             steps {

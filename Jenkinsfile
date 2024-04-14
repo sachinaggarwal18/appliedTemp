@@ -7,7 +7,6 @@ pipeline {
     }
 
     environment {
-        SCANNER_HOME = tool 'sonar-scanner'
         APP_NAME = "chat-app"
         RELEASE = "1.0.0"
         DOCKER_USER = "sachin1818"
